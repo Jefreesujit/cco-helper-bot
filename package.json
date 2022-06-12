@@ -1,0 +1,32 @@
+{
+  "name": "cco-helper-bot",
+  "version": "1.0.0",
+  "description": "A simple helper discord bot for Cyber code online to track in-game event and activities",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cco",
+    "cyber",
+    "code",
+    "online",
+    "cybercode",
+    "cybercodeonline",
+    "helper",
+    "discord",
+    "bot"
+  ],
+  "author": "Jefreesujit",
+  "license": "ISC",
+  "dependencies": {
+    "@replit/database": "^2.0.2",
+    "@supabase/realtime-js": "^1.7.2",
+    "discord.js": "^12.5.1",
+    "dot-env": "0.0.1",
+    "dotenv": "^8.2.0",
+    "node-fetch": "^2.6.7",
+    "request": "^2.88.2"
+  }
+}
