@@ -1,11 +1,12 @@
-require('dotenv').config();
 const http = require('http');
 const Discord = require('discord.js');
+const { RealtimeClient } = require('@supabase/realtime-js');
+require('dotenv').config();
+
 const { prefix } = require('./config.json');
 const resolvers = require('./src/resolvers');
-const { RealtimeClient } = require('@supabase/realtime-js');
 const { messageHandler, pushEvents } = require('./src/handlers');
-const client = require('./src/services/initClient');
+const client = require('./src/services/dsClient');
 
 
 const JWT = process.env.CCO_JWT;
@@ -43,9 +44,10 @@ for (const key in resolvers) {
   client.commands.set(command.name, command);
 }
 
-client.once('ready', () => {
+client.once('ready', async () => {
 	console.log('CCO Helper Bot Server Ready!');
-	pushEvents('Hello epic test', 'epic');
+	// const response = await pushEvents('Hello epic test', 'epic');
+	// console.log('push response', response);
 });
 
 client.on('message', message => {

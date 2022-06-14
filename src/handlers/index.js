@@ -1,19 +1,12 @@
 const fetch = require('node-fetch');
 const { getChannelsList } = require('../services');
-const client = require('../services/initClient');
-
-
-const eventsUrl = 'https://discord.com/api/webhooks/960510239554293820/5phUsCh4IHKTuL0XNLbKZ_LEpEhTV-cXQa-8X-afCK5iHPZrKVPCXAVfLfh_f5xetOFS';
+const client = require('../services/dsClient');
 
 // personal server
-// const hookUrl = 'https://discord.com/api/webhooks/960510239554293820/5phUsCh4IHKTuL0XNLbKZ_LEpEhTV-cXQa-8X-afCK5iHPZrKVPCXAVfLfh_f5xetOFS';
 // const role = '<@&962215054005141575>';
-// const epicHookUrl = hookUrl;
 // const epicRole = role;
 
 // fried rice server
-const hookUrl = 'https://discord.com/api/webhooks/963049861220032582/0560pIXdu5ScAXDLBsbT7xaHkzeuMhn8lEXcE6BDEQvXr2MOwOuvbniJDFsnUR9c8qtr';
-const epicHookUrl = 'https://discord.com/api/webhooks/967021622114541588/QbMlOufMfeTYHCmD5xaVF0JGypen0AQdU15m8HShKwkFG0CUn_A5mp32m49oLMn1VmGE';
 const role = '<@&960109485618241587>';
 const epicRole = '<@&967021002678738944>';
 
@@ -23,14 +16,6 @@ const caliSafetyPrefix = 'safety';
 const epicPrefix = 'received epic';
 
 let messageCtx = [], isTimeoutActive = false, buffVal = 0;
-
-const delay = async (timer = 5000) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(timer);
-    }, timer);
-  });
-}
 
 // calculate the buff score from percentage
 // Contribution credits: Rejid
@@ -75,74 +60,44 @@ const getBuffPerc = (messageText) => {
 };
 
 // Experimental : Push all events to another events bot
-const pushEvents = (eventText, eventType) => {
-  return new Promise((resolve, reject) => {
-    getChannelsList(eventType).then((channelList) => {
-      // console.log('channelList', channelList);
-      const messageList = [];
-      client.channels.cache.forEach(channel => {
-        // console.log('channel', channel);
-        if (channel.type === 'text' && channelList.includes(channel.id)) {
-          channel.send(eventText).then((response) => {
-            // console.log('response', response);
-            messageList.push(response);
-            resolve(response);
-          }).catch(e => {
-            console.log(e);
-            reject('Push Failure');
-          });
-        }
-      })
-    });
-  })
+const pushEvents = async (eventText, eventType) => {
+  const channelList = await getChannelsList(eventType);
+  // console.log('channelList', channelList);
+  const allowedChannels = client.channels.cache;
+  const messageList = [];
+  for (let [id, channel] of client.channels.cache) {
+    if (channel.type === 'text' && channelList.includes(id)) {
+      // console.log('channel', channel);
+      const response = await channel.send(eventText);
+      messageList.push(response);
+    }
+  }
+
+  return messageList;
 };
 
 const trackEpicDrop = async (eventText) => {
   const response = await pushEvents(eventText, 'epic');
   console.log('track epic', response);
-  // fetch(`${epicHookUrl}?wait=true`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Accept': 'application/json',
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ content: eventText })
-  // });
+  return response;
 };
 
 
 // Send message to bot
 const sendMessage = async (message) => {
-  const response = await pushEvents(eventText, 'cali');
+  const response = await pushEvents(message, 'cali');
   console.log('track cali', response);
-  // const rawResponse = await fetch(`${hookUrl}?wait=true`, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Accept': 'application/json',
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ content: message })
-  // });
-  // const content = await rawResponse.json();
-  // console.log('response', content);
-  // return content;
+  return response;
 };
 
-// Update existing message if messageId already present
+// Update existing message if messageCtx already present
 const updateMessage = async (messageText) => {
-  messageCtx.forEach((message) => {
-    message.edit(messageText).then(msg => console.log('updated', msg.id));
-  })
-  // const rawResponse = await fetch(`${hookUrl}/messages/${msgId}`, {
-  //   method: 'PATCH',
-  //   headers: {
-  //     'Accept': 'application/json',
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify({ content: message })
-  // });
-  // const content = await rawResponse.json();
-  // return content;
+  for (let message in messageCtx) {
+    const response = await message.edit(messageText);
+    console.log('Updated', message.id);
+  }
+
+  return messageCtx;
 };
 
 const formatBuffMessage = (name, type, role, person) => {
@@ -182,7 +137,7 @@ const getMessage = (record) => {
     try {
       const [tBuffPerc, tBuffName] = getBuffPerc(buffText);
       const buffScore = getBuffScoreFromPerc(tBuffPerc);
-      message = formatBuffMessage(tBuffName, buffScore, role, activatedBy)
+      message = formatBuffMessage(tBuffName, buffScore, role, activatedBy);
     } catch (e) {
       console.log('Failed fetching buff percenatage', e);
     }
@@ -204,22 +159,22 @@ const getMessage = (record) => {
   return message;
 };
 
-  // Callback handler for observed dom mutations
+  // Callback handler for listened websocket events
 const messageHandler = async (event) => {
   const message = getMessage(event.record);
   if (message) {
     if (messageCtx.length) {
       console.log('updateMessage', message);
-      const msg = await updateMessage(message);
+      const msgList = await updateMessage(message);
     } else {
       console.log('sendMessage', message);
       const msgList = await sendMessage(message);
-      messageCtx.push(msg);
+      messageCtx = msgList;
     }
   }
-  // Persist the messageId for 4 minutes when new matching buff is added.
-  // Whenever a buff is added within that time, update existing message with this messageId
-  // Erase the messageId after 4 minutes (active buff time) and push upcoming event as new buffs
+  // Persist the message context for 4 minutes when new matching buff is added.
+  // Whenever a buff is added within that time, update existing message with this message context
+  // Erase the message context after 4 minutes (active buff time) and push upcoming event as new buffs
   if (messageCtx.length && !isTimeoutActive) {
     isTimeoutActive = true;
     setTimeout(() => {
