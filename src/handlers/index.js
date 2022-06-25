@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-const { getChannelsList } = require('../services');
+const { getChannelsList, getRolesMap } = require('../services');
 const client = require('../services/dsClient');
 
 // personal server
@@ -7,8 +7,8 @@ const client = require('../services/dsClient');
 // const epicRole = role;
 
 // fried rice server
-const role = '<@&960109485618241587>';
-const epicRole = '<@&967021002678738944>';
+const role = 'dummyrole';
+const epicRole = 'dummyrole';
 
 // buff to be looked for
 const buffPrefix = 'calibration';
@@ -62,12 +62,18 @@ const getBuffPerc = (messageText) => {
 // Experimental : Push all events to another events bot
 const pushEvents = async (eventText, eventType) => {
   const channelList = await getChannelsList(eventType);
+  const rolesMap = await getRolesMap(eventType);
   // console.log('channelList', channelList);
   const allowedChannels = client.channels.cache;
   const messageList = [];
   for (let [id, channel] of client.channels.cache) {
     if (channel.type === 'text' && channelList.includes(id)) {
       // console.log('channel', channel);
+      const role = rolesMap[id];
+      console.log('event channel and role', eventType, id, role);
+      if (role) {
+        eventText = eventText.replace('dummyrole', role);
+      };
       const response = await channel.send(eventText);
       messageList.push(response);
     }
@@ -92,7 +98,7 @@ const sendMessage = async (message) => {
 
 // Update existing message if messageCtx already present
 const updateMessage = async (messageText) => {
-  for (let message in messageCtx) {
+  for (let message of messageCtx) {
     const response = await message.edit(messageText);
     console.log('Updated', message.id);
   }
