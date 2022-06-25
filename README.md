@@ -19,7 +19,7 @@ Invite bot to the server by clicking the discord button below:
 ```
 !cco configure <option> <vars>
 
-- guild <guildname>
+- gang <gang id>
 - timezone <country>
 - alias <command> [PRO]
 ```
@@ -33,10 +33,10 @@ Invite bot to the server by clicking the discord button below:
 ```
 
 ```
-!albion gang <option> <name>
+!cco gang <option>
 
-- stats <gangname>
-- topcontribs <<channelname>>
+- stats
+- topcontribs
 ```
 
 

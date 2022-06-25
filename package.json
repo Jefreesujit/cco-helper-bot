@@ -23,6 +23,7 @@
   "dependencies": {
     "@replit/database": "^2.0.2",
     "@supabase/realtime-js": "^1.7.2",
+    "ascii-table": "0.0.9",
     "discord.js": "^12.5.1",
     "dot-env": "0.0.1",
     "dotenv": "^8.2.0",
