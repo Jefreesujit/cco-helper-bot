@@ -76,11 +76,11 @@ const getGangTopContribs = async (guildId) => {
   const gangId = gangMap[guildId];
   const gangDetails = await fetchGangInfo(gangId);
   const members = Object.values(gangDetails.members);
-  const sortedMembers = members.sort((a, b) => (b.expContribution - a.expContribution));
+
   return {
     name: gangDetails.displayName,
     image: gangDetails.image,
-    members: sortedMembers,
+    members,
   };
 }
 

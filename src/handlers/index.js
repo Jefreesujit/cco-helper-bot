@@ -11,7 +11,7 @@ const role = 'dummyrole';
 const epicRole = 'dummyrole';
 
 // buff to be looked for
-const buffPrefix = 'calibration';
+const buffPrefix = 'calibration ';
 const caliSafetyPrefix = 'safety';
 const epicPrefix = 'received epic';
 
@@ -98,7 +98,12 @@ const sendMessage = async (message) => {
 
 // Update existing message if messageCtx already present
 const updateMessage = async (messageText) => {
+  const rolesMap = await getRolesMap(eventType);
   for (let message of messageCtx) {
+    const role = rolesMap[message.channel.id];
+    if (role) {
+      messageText = messageText.replace('dummyrole', role);
+    };
     const response = await message.edit(messageText);
     console.log('Updated', message.id);
   }
