@@ -98,7 +98,7 @@ const sendMessage = async (message) => {
 
 // Update existing message if messageCtx already present
 const updateMessage = async (messageText) => {
-  const rolesMap = await getRolesMap(eventType);
+  const rolesMap = await getRolesMap('cali');
   for (let message of messageCtx) {
     const role = rolesMap[message.channel.id];
     if (role) {
@@ -172,7 +172,7 @@ const getMessage = (record) => {
 
   // Callback handler for listened websocket events
 const messageHandler = async (event) => {
-  const message = getMessage(event.record);
+  const message = getMessage(event.msg);
   if (message) {
     if (messageCtx.length) {
       console.log('updateMessage', message);

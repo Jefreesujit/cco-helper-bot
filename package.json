@@ -4,7 +4,7 @@
   "description": "A simple helper discord bot for Cyber code online to track in-game event and activities",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "sh cco-test.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -28,6 +28,7 @@
     "dot-env": "0.0.1",
     "dotenv": "^8.2.0",
     "node-fetch": "^2.6.7",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "ws": "^8.8.0"
   }
 }
