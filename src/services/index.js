@@ -84,6 +84,31 @@ const getGangTopContribs = async (guildId) => {
   };
 }
 
+const getGangRankDetails = async (guildId) => {
+  const gangMap = await db.get('gang');
+  const rankMap = await db.get('ranking');
+  const gangId = gangMap[guildId];
+  const gangRank = rankMap[guildId];
+  const gangDetails = await fetchGangInfo(gangId);
+  const members = Object.values(gangDetails.members);
+
+  return {
+    name: gangDetails.displayName,
+    image: gangDetails.image,
+    members,
+    ranking: gangRank,
+  };
+}
+
+const setGangRankDetails = async (guildId, ranking) => {
+  const value = await db.get('ranking');
+  const rankMap = value || {};
+  rankMap[guildId] = ranking;
+  await db.set('ranking', rankMap);
+
+  return true;
+}
+
 module.exports = {
   trackEventInChannel,
   getGangDetails,
@@ -93,4 +118,6 @@ module.exports = {
   getGangTopContribs,
   getRolesMap,
   setRoleForChannel,
+  getGangRankDetails,
+  setGangRankDetails,
 }
