@@ -7,5 +7,6 @@ db.get("epic").then(value => console.log('epic', value));
 db.get("epicRole").then(value => console.log('epicRole', value));
 db.get("buffs").then(value => console.log('buffs', value));
 db.get("gang").then(value => console.log('gang', value));
+db.get("ranking").then(value => console.log('ranking', value));
 
 // '763836152288903198': '<@&962215054005141575>'

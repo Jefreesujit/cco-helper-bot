@@ -4,12 +4,14 @@ const track = require('./track');
 const untrack = require('./untrack');
 const help = require('./help');
 const configure = require('./configure');
+const ranking = require('./ranking');
 
 module.exports = {
-  track,
-  guild,
   help,
   configure,
+  guild,
+  ranking,
+  track,
   untrack,
   ...common
 };
