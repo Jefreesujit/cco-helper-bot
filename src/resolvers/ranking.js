@@ -27,14 +27,14 @@ module.exports = {
       getGangRankDetails(guildId).then((data) => {
         console.log('data', data);
         if (!data.ranking) {
-          const startExp = getPlayersExp(data.members);
-          setGangRankDetails(guildId, startExp).then((data) => {
-            const msg = `Ranking started successfully at <t:${Math.round(Date.now() / 1000)}:d> \n You can track rank progress by running "!cco ranking status" command`;
-            message.channel.send(msg);
+        const startExp = getPlayersExp(data.members);
+        setGangRankDetails(guildId, startExp).then((data) => {
+          const msg = `Ranking started successfully at <t:${Math.round(Date.now() / 1000)}:d> \n You can track rank progress by running "!cco ranking status" command`;
+          message.channel.send(msg);
           }).catch(error => {
-            console.log('Start ranking error', error);
-            message.channel.send('Error starting ranking, make sure your gang is configured properly.');
-          });
+           console.log('Start ranking error', error);
+           message.channel.send('Error starting ranking, make sure your gang is configured properly.');
+         });
         } else {
           message.channel.send('There is an active ranking in progress. You can track rank progress by running "!cco ranking status" command');
         }
@@ -48,7 +48,7 @@ module.exports = {
         const startExp = data.ranking;
         if (startExp) {
           const currentExp = getPlayersExp(data.members);
-          const rankings = calculatePlayerRankings(startExp, startExp);
+          const rankings = calculatePlayerRankings(startExp, currentExp);
           const topContribs = rankings.map((mem, i) => `${i + 1} ${mem.PlayerName} ${mem.StartExp} ${mem.CurrentExp} ${mem.ExpGain}`).slice(0, 10);
           console.log('topcontrib res', topContribs);
   
@@ -83,7 +83,7 @@ module.exports = {
         if (startExp) {
           const currentExp = getPlayersExp(data.members);
           setGangRankDetails(guildId, null).then((data) => {
-            const rankings = calculatePlayerRankings(startExp, startExp);
+            const rankings = calculatePlayerRankings(startExp, currentExp);
             const topContribs = rankings.map((mem, i) => `${i + 1} ${mem.PlayerName} ${mem.StartExp} ${mem.CurrentExp} ${mem.ExpGain}`).slice(0, 10);
             console.log('topcontrib res', topContribs);
   

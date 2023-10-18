@@ -172,28 +172,30 @@ const getMessage = (record) => {
 
   // Callback handler for listened websocket events
 const messageHandler = async (event) => {
-  const message = getMessage(event.msg);
-  if (message) {
-    if (messageCtx.length) {
-      console.log('updateMessage', message);
-      const msgList = await updateMessage(message);
-    } else {
-      console.log('sendMessage', message);
-      const msgList = await sendMessage(message);
-      messageCtx = msgList;
+  if (event.msg && event.msg.senderName === 'SYSTEM') {
+    const message = getMessage(event.msg);
+    if (message) {
+      if (messageCtx.length) {
+        console.log('updateMessage', message);
+        const msgList = await updateMessage(message);
+      } else {
+        console.log('sendMessage', message);
+        const msgList = await sendMessage(message);
+        messageCtx = msgList;
+      }
     }
-  }
-  // Persist the message context for 4 minutes when new matching buff is added.
-  // Whenever a buff is added within that time, update existing message with this message context
-  // Erase the message context after 4 minutes (active buff time) and push upcoming event as new buffs
-  if (messageCtx.length && !isTimeoutActive) {
-    isTimeoutActive = true;
-    setTimeout(() => {
-      console.log('messageCtx', messageCtx)
-      messageCtx = [];
-      buffVal = 0;
-      isTimeoutActive = false;
-    }, 240000);
+    // Persist the message context for 4 minutes when new matching buff is added.
+    // Whenever a buff is added within that time, update existing message with this message context
+    // Erase the message context after 4 minutes (active buff time) and push upcoming event as new buffs
+    if (messageCtx.length && !isTimeoutActive) {
+      isTimeoutActive = true;
+      setTimeout(() => {
+        console.log('messageCtx', messageCtx)
+        messageCtx = [];
+        buffVal = 0;
+        isTimeoutActive = false;
+      }, 240000);
+    }
   }
 };
 

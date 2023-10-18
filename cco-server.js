@@ -9,6 +9,7 @@ const { messageHandler, pushEvents } = require('./src/handlers');
 const client = require('./src/services/dsClient');
 
 const sid = process.argv[2];
+const token = process.argv[3];
 
 const ws = new WebSocket(`wss://prod.cybercodeonline.link/socket.io/?EIO=4&transport=websocket&sid=${sid}`);
 const send = (msg) => ws.send(msg, () => console.log(`sent ${msg}`));
@@ -20,7 +21,13 @@ ws.on('open', () => {
 
 ws.on('message', (data, rest) => {
 	console.log(`received ${data} ${rest}`);
-	if (data == "3probe") { send("5"); }
+	if (data == "3probe") {
+    send("5");
+    setTimeout(() => {
+      send(`421["/c/l",{"t":"${token}","c":"S"}]`);
+      send(`422["/c/l",{"t":"${token}","c":"897fLt"}]`);
+    }, 1000);
+  }
 	if (data == "2") { send("3"); }
 	if (data.indexOf("42[") === 0) {
 		const rawMessage = data.slice(2);
@@ -70,4 +77,4 @@ client.on('message', message => {
 
 http.createServer(function (req, res) {
 	res.write("I'm alive"); res.end();
-}).listen(8080);
+}).listen(8081);
